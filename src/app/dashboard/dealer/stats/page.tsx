@@ -1,4 +1,4 @@
-import { getServerSession } from "next/auth"
+import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
@@ -35,7 +35,17 @@ export default async function DealerStatsPage() {
     )
   }
 
-  const dealerId = user.dealerId!
+  if (!user && session.user.role !== "SUPER_ADMIN") {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">
+          Ошибка загрузки данных пользователя
+        </p>
+      </div>
+    )
+  }
+
+  const dealerId = user?.dealerId || ""
 
   // Для менеджера показываем заявки без менеджера + его назначенные заявки
   const isManager = session.user.role === "MANAGER"
@@ -98,6 +108,7 @@ export default async function DealerStatsPage() {
       monthValue: thisMonthApplications.length,
       icon: Users,
       color: "text-blue-600",
+      suffix: undefined as string | undefined,
     },
     {
       title: "Завершенных продаж",
@@ -105,6 +116,7 @@ export default async function DealerStatsPage() {
       monthValue: thisMonthSales.length,
       icon: CheckCircle,
       color: "text-green-600",
+      suffix: undefined as string | undefined,
     },
     {
       title: "Общая выручка",
@@ -112,6 +124,7 @@ export default async function DealerStatsPage() {
       monthValue: formatPrice(thisMonthRevenue),
       icon: DollarSign,
       color: "text-primary",
+      suffix: undefined as string | undefined,
     },
   ]
 
@@ -119,7 +132,7 @@ export default async function DealerStatsPage() {
   const stats = isManager
     ? baseStats
     : [
-        baseStats[0],
+        baseStats[0]!,
         {
           title: "Автомобили в продаже",
           value: dealerCars.length,

@@ -75,8 +75,10 @@ export function Stories({ dealerStories }: StoriesProps) {
     } else if (selectedDealer !== null && selectedDealer > 0) {
       setSelectedDealer(selectedDealer - 1)
       const prevDealer = dealerStories[selectedDealer - 1]
-      setCurrentStoryIndex(prevDealer.stories.length - 1)
-      setProgress(0)
+      if (prevDealer) {
+        setCurrentStoryIndex(prevDealer.stories.length - 1)
+        setProgress(0)
+      }
     }
   }
 

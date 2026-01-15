@@ -1,4 +1,4 @@
-import { getServerSession } from "next-auth"
+import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"
 import Image from "next/image"
 import { authOptions } from "@/lib/auth"
@@ -29,7 +29,7 @@ export default async function DealerStoriesPage() {
   }
 
   const stories = await prisma.story.findMany({
-    where: session.user.role === "SUPER_ADMIN"
+    where: session.user.role === "SUPER_ADMIN" || !user
       ? {}
       : { dealerId: user.dealerId! },
     include: {

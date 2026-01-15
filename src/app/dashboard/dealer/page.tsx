@@ -1,4 +1,4 @@
-import { getServerSession } from "next-auth"
+import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
@@ -33,7 +33,7 @@ export default async function DealerDashboardPage() {
 
   // Для менеджера показываем заявки без менеджера + его назначенные заявки
   const isManager = session.user.role === "MANAGER"
-  const applicationWhere = session.user.role === "SUPER_ADMIN"
+  const applicationWhere = session.user.role === "SUPER_ADMIN" || !user
     ? {}
     : isManager
     ? {

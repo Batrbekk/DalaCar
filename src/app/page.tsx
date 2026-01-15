@@ -101,8 +101,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     if (!acc[car.brand]) {
       acc[car.brand] = []
     }
-    if (!acc[car.brand].includes(car.model)) {
-      acc[car.brand].push(car.model)
+    if (!acc[car.brand]!.includes(car.model)) {
+      acc[car.brand]!.push(car.model)
     }
     return acc
   }, {} as Record<string, string[]>)

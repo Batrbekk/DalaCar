@@ -34,7 +34,7 @@ export function UserForm({ dealers }: { dealers: Dealer[] }) {
     name: "",
     phone: "+77",
     password: "",
-    role: "CLIENT" as const,
+    role: "CLIENT" as "CLIENT" | "MANAGER" | "DEALER_ADMIN" | "SUPER_ADMIN",
     dealerId: "",
   })
 

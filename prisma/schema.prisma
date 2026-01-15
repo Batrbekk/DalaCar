@@ -107,6 +107,7 @@ model Car {
   media        CarMedia[]
   dealers      DealerCar[]
   applications Application[]
+  sales        Sale[]
 
   @@index([brand, model])
 }
@@ -197,6 +198,7 @@ model Sale {
   dealerId      String   @db.ObjectId
   dealer        Dealer   @relation(fields: [dealerId], references: [id])
   carId         String   @db.ObjectId
+  car           Car      @relation(fields: [carId], references: [id])
   managerId     String?  @db.ObjectId
   manager       User?    @relation(fields: [managerId], references: [id])
   salePrice     Float

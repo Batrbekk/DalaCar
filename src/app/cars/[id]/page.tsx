@@ -65,7 +65,7 @@ export default async function CarPage({ params }: CarPageProps) {
     notFound()
   }
 
-  const lowestPrice = car.dealers.length > 0 ? car.dealers[0].price : 0
+  const lowestPrice = car.dealers.length > 0 ? car.dealers[0]!.price : 0
 
   return (
     <div className="min-h-screen bg-background">
@@ -269,7 +269,7 @@ export default async function CarPage({ params }: CarPageProps) {
               carId={car.id}
               carName={`${car.brand} ${car.model} ${car.year}`}
               carPrice={lowestPrice}
-              dealerId={car.dealers[0].dealerId}
+              dealerId={car.dealers[0]!.dealerId}
             />
           )}
         </div>
