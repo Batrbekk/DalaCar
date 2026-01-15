@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLIENT
+  MANAGER
+  DEALER_ADMIN
+  SUPER_ADMIN
+}
+
+enum ApplicationStatus {
+  NEW
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum BodyType {
+  SEDAN
+  SUV
+  HATCHBACK
+  COUPE
+  WAGON
+  VAN
+}
+
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+  ROBOT
+  CVT
+}
+
+enum Drive {
+  FWD
+  RWD
+  AWD
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone     String   @unique
+  email     String?  @unique
+  password  String
+  name      String
+  role      UserRole @default(CLIENT)
+  dealerId  String?  @db.ObjectId
+  dealer    Dealer?  @relation(fields: [dealerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications        Application[]
+  managedApplications Application[] @relation("ManagerApplications")
+  sales               Sale[]
+}
+
+model Dealer {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  address     String
+  phone       String
+  email       String
+  logo        String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users        User[]
+  cars         DealerCar[]
+  stories      Story[]
+  sales        Sale[]
+  applications Application[]
+}
+
+model Car {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  brand           String
+  model           String
+  year            Int
+  bodyType        BodyType
+  engine          String
+  transmission    Transmission
+  drive           Drive
+  power           Int
+  acceleration    Float?
+  fuelConsumption Float?
+  seatingCapacity Int          @default(5)
+  trunkVolume     Int?
+  color           String?
+  interiorColor   String?
+  features        String[]     @default([])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  media        CarMedia[]
+  dealers      DealerCar[]
+  applications Application[]
+
+  @@index([brand, model])
+}
+
+model CarMedia {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  carId     String    @db.ObjectId
+  car       Car       @relation(fields: [carId], references: [id], onDelete: Cascade)
+  url       String
+  type      MediaType @default(IMAGE)
+  isPrimary Boolean   @default(false)
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  @@index([carId, isPrimary])
+}
+
+model DealerCar {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  dealerId     String   @db.ObjectId
+  dealer       Dealer   @relation(fields: [dealerId], references: [id])
+  carId        String   @db.ObjectId
+  car          Car      @relation(fields: [carId], references: [id])
+  price        Float
+  inStock      Boolean  @default(true)
+  specialOffer Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([dealerId, inStock])
+  @@index([carId])
+}
+
+model Story {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  dealerId  String    @db.ObjectId
+  dealer    Dealer    @relation(fields: [dealerId], references: [id])
+  mediaUrl  String
+  mediaType MediaType @default(IMAGE)
+  duration  Int       @default(5)
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([isActive, expiresAt])
+}
+
+model Application {
+  id             String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String            @db.ObjectId
+  user           User              @relation(fields: [userId], references: [id])
+  dealerId       String            @db.ObjectId
+  dealer         Dealer            @relation(fields: [dealerId], references: [id])
+  carId          String            @db.ObjectId
+  car            Car               @relation(fields: [carId], references: [id])
+  managerId      String?           @db.ObjectId
+  manager        User?             @relation("ManagerApplications", fields: [managerId], references: [id])
+  status         ApplicationStatus @default(NEW)
+  name           String
+  phone          String
+  city           String
+  message        String?
+  iin            String?           // ИИН клиента
+  salary         Float?            // Зарплата клиента
+  managerCode    String?           // Код менеджера
+
+  // Кредитные поля
+  carPrice       Float?
+  downPayment    Float?
+  loanTerm       Int?
+  monthlyPayment Float?
+  creditScore    Int?              // Скоринговый балл
+
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  sale Sale?
+
+  @@index([dealerId, status])
+  @@index([userId])
+  @@index([carId])
+}
+
+model Sale {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  applicationId String   @unique @db.ObjectId
+  application   Application @relation(fields: [applicationId], references: [id])
+  dealerId      String   @db.ObjectId
+  dealer        Dealer   @relation(fields: [dealerId], references: [id])
+  carId         String   @db.ObjectId
+  managerId     String?  @db.ObjectId
+  manager       User?    @relation(fields: [managerId], references: [id])
+  salePrice     Float
+  saleDate      DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  @@index([dealerId, saleDate])
+  @@index([managerId])
+}

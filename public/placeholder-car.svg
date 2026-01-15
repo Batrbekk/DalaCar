@@ -1,0 +1,14 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#F1F5F9"/>
+  <g transform="translate(200, 120)">
+    <!-- Иконка автомобиля -->
+    <path d="M-50,-20 L-30,-40 L30,-40 L50,-20 L50,20 L-50,20 Z" fill="#94A3B8" stroke="#64748B" stroke-width="2"/>
+    <circle cx="-30" cy="20" r="8" fill="#475569"/>
+    <circle cx="30" cy="20" r="8" fill="#475569"/>
+    <rect x="-40" y="-35" width="30" height="15" fill="#CBD5E1"/>
+    <rect x="10" y="-35" width="30" height="15" fill="#CBD5E1"/>
+  </g>
+  <text x="200" y="200" font-family="Arial, sans-serif" font-size="16" fill="#64748B" text-anchor="middle">
+    Фото скоро появится
+  </text>
+</svg>
